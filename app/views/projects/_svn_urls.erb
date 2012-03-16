@@ -1,0 +1,43 @@
+<% if @project.repository && @project.repository.is_a?(Repository::Subversion) %>
+	<% content_for :header_tags do %>
+
+		<%= stylesheet_link_tag('svn_url_display', :plugin => 'redmine_svn_info') %>
+		<%= javascript_include_tag('svn_url_display', :plugin => 'redmine_svn_info') %>
+		
+		<%= stylesheet_link_tag('zero_clipboard', :plugin => 'redmine_svn_info') %>
+		<%= javascript_include_tag('ZeroClipboard', :plugin => 'redmine_svn_info') %>
+		<%= javascript_include_tag('zero_clipboard_setup', :plugin => 'redmine_svn_info') %>
+
+
+		<script type="text/javascript">
+
+			guProjectName= "<%= @project.name %>"  
+			guProjectIsPublic= <%= project.is_public.to_s %> ;
+			guUser= "<%= User.current.login %>"
+			guUserIsCommitter= <%= User.current.allowed_to?(:commit_access, project) ? "true" : "false" %> ;
+			guHttpBase="<%= @project.repository.url %>"
+			guHttpProto="http"
+
+			window.onload = setGitUrlOnload
+
+			ZeroClipboard.setMoviePath('<%= image_path('ZeroClipboard.swf', :plugin => 'redmine_svn_info') %>');
+			setZeroClipboardInputSource("svn_url_text");
+		</script>
+	<% end %>
+
+	<% if (project.module_enabled?(:repository)  && ((!User.current.anonymous?) || (project.is_public))) %>
+		<div class="box">
+			<h3>Subversion Repository</h3>
+			<div id="svn_url_box">
+				<ul id="svn_url_list" >
+					<li><a id="svn_url_http" href="javascript:void(0)">HTTP</a></li>
+				</ul>
+				<input id="svn_url_text" name="svn_url_text" readonly="readonly" value="" />
+				<div id="clipboard_container" title="<%= l(:label_copy_to_clipboard) %>" style="display: none;">
+					<div id="clipboard_button"><%= image_tag 'paste.png', :plugin => 'redmine_svn_info' %></div>
+				</div>
+				<span  id="svn_url_desc">This URL has <span id="svn_url_access">Read-Only</span> access.</span>
+			</div>
+		</div>
+	<% end %>
+<% end %>
